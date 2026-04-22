@@ -44,7 +44,7 @@ const commands = {
                     let incogWin = window.open("about:blank", "Flint-Incog");
                     if(incogWin){
                         incogWin.document.open();
-                        incogWin.document.write(`<head><title>Home | Schoology</title><link rel="icon" type="image/x-icon" href="https://t1.gstatic.com/faviconV2?client=SOCIAL&amp;type=FAVICON&amp;fallback_opts=TYPE,SIZE,URL&amp;url=http://schoology.com&amp;size=64"><head><body><iframe src="${args[0]}" style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; border: 0; outline: 0;"></iframe></body>`);
+                        incogWin.document.write(`<head><title>Home | Schoology</title><link rel="icon" type="image/x-icon" href="https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://schoology.com&size=64"><head><body><iframe src="${args[0]}" style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; border: 0; outline: 0;"></iframe></body>`);
                         incogWin.document.close();
                     }
                     return warn("NOTE: using --incog requires the specified website to accept itself to be embedded.");
