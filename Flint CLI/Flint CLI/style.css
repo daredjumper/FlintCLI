@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+:root{
+    --default-text: #eeeeee;
+    --info-text: #6ea3c7;
+    --error-text: #c76e6e;
+    --warn-text: #b4c76e;
+    --success-text: #75c76e;
+    --other-text: #6ec7c2;
+}
+
+body, html{
+    background: #14141a;
+    margin: 0; padding: 0;
+    color: var(--default-text);
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-ligatures: normal; /* Enables the cool coding ligatures */
+    font-optical-sizing: auto;
+    font-size: 16px;
+    height: 100%;
+}
+
+.default-font{
+    font-family: 'Consolas', monospace;
+}
+
+#terminal{
+    padding: 15px;
+}
+
+#logs {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-ligatures: normal; /* Enables the cool coding ligatures */
+    font-optical-sizing: auto;
+    font-size: 16px;
+    margin: 0;
+}
+
+.input-line{
+    display: flex;
+    align-items: center;
+}
+
+.input-container{
+    position: relative;
+    flex-grow: 1;
+}
+
+#cmd-input {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    width: 100%;
+    outline: none;
+    margin-left: 9.6px;
+}
+
+.default-text{
+    color: var(--default-text)
+}
+.info-text{
+    color: var(--info-text)
+}
+.error-text{
+    color: var(--error-text)
+}
+.warn-text{
+    color: var(--warn-text)
+}
+.success-text{
+    color: var(--success-text)
+}
+.other-text{
+    color: var(--other-text)
+}
