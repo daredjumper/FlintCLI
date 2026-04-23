@@ -1,11 +1,14 @@
 const input = $("#cmd-input");
 const history = $("#logs");
+const fvim = $("#fvim");
+
+var focusToggle = true;
 
 // Command Management
 const commands = {
-    help: {
+    cmds: {
         desc: "Show available commands",
-        usage: "help [command]",
+        usage: "cmds [command]",
         run(args) {
             if (args[0]) {
                 const cmd = commands[args[0]];
@@ -41,16 +44,39 @@ const commands = {
             if (args[1]) {
                 const flag = args[1];
                 if(flag == "--incog"){
-                    let incogWin = window.open("about:blank", "Flint-Incog");
+                    let incogWin = window.open("about:blank", "_blank");
+                    const incognitoSites = [
+                        { name: "Home | Schoology", icon: "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://schoology.com&size=64" },
+                        { name: "Google", icon: "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=64" },
+                        { name: "Gmail", icon: "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://gmail.com&size=64" },
+                        { name: "YouTube", icon: "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://youtube.com&size=64" },
+                        { name: "Canvas", icon: "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://instructure.com&size=64" },
+                    ];
+
+                    const disguise = incognitoSites[Math.floor(Math.random() * incognitoSites.length)];
                     if(incogWin){
                         incogWin.document.open();
-                        incogWin.document.write(`<head><title>Home | Schoology</title><link rel="icon" type="image/x-icon" href="https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://schoology.com&size=64"><head><body><iframe src="${args[0]}" style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; border: 0; outline: 0;"></iframe></body>`);
+                        incogWin.document.write(`<!DOCTYPE html><html><head><title>${disguise.name}</title></head><body><iframe src="${args[0]}" style="top:0;left:0;width:100%;height:100%;position:absolute;border:0;outline:0;"></iframe></body></html>`);
                         incogWin.document.close();
+
+                        const link = incogWin.document.createElement('link');
+                        link.rel = 'icon';
+                        link.type = 'image/png';
+                        link.href = disguise.icon;
+                        incogWin.document.head.appendChild(link);
                     }
                     return warn("NOTE: using --incog requires the specified website to accept itself to be embedded.");
                 }
             }
             window.open(args[0]);
+            return null; // null = no output
+        }
+    },
+    fvim: {
+        desc: "Opens the Flint CLI Text Editor.",
+        usage: "fivm",
+        run() {
+            openfvim();
             return null; // null = no output
         }
     }
@@ -89,7 +115,7 @@ input.on('keydown', function(e) {
         let block = `C:\\Flint\\admin> ${fullCommand}`;
 
         if (!cmd) {
-            block += `\n${error(`'${cmdName}' is not a recognized command. Run 'help' for a list.`)}\n`;
+            block += `\n${error(`'${cmdName}' is not a recognized command. Run 'cmds' for a list.`)}\n`;
         } else {
             const output = cmd.run(args);
             if (output !== null) block += `\n${output}\n`;
@@ -98,5 +124,53 @@ input.on('keydown', function(e) {
         history.append(`${block}\n`);
         input.val("");
         window.scrollTo(0, document.body.scrollHeight);
+    }
+});
+
+function focusTerminal(){
+    if (focusToggle) document.getElementById('cmd-input').focus();
+}
+
+/* Fvim Functionality */
+function openfvim(){
+    fvim.css("display", "flex");
+    $('body').css('cursor', 'none');
+    focusToggle = false;
+    setTimeout(function(){
+        document.getElementById('fvim-textarea').focus();
+    }, 100)
+}
+
+function closefvim(){
+    fvim.css('display', 'none');
+    $('body').css('cursor', 'default');
+    focusToggle = true;
+    setTimeout(function(){
+        document.getElementById('cmd-input').focus();
+    }, 100)
+}
+
+// Allow tabbing in Fvim
+$("#fvim-textarea").on('keydown', function(event){
+    if (event.keyCode === 9) {
+        event.preventDefault(); // Prevent the default tab behavior
+        const el = this;
+        const start = el.selectionStart;
+        const end = el.selectionEnd;
+        const $this = $(el);
+        const value = $this.val();
+
+        // Set the new value: text before + tab + text after
+        $this.val(value.substring(0, start) + "\t" + value.substring(end));
+
+        // Put the cursor back in the right place
+        el.selectionStart = el.selectionEnd = start + 1;
+    }
+});
+
+$("#fvim-textarea").on('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'q') {
+        e.preventDefault();
+        closefvim();
     }
 });

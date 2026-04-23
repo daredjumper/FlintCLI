@@ -5,7 +5,7 @@
         <title>Flint CLI</title>
         <link href="style.css" rel="stylesheet">
     </head>
-    <body onclick="document.getElementById('cmd-input').focus()">
+    <body onclick="focusTerminal();">
         <div id="terminal">
             <pre id="logs"><b><span class="default-font info-text">██████ ██      ██ ███    ██ ████████      ██████ ██      ██ 
 ██     ██      ██ ████   ██    ██        ██      ██      ██ 
@@ -22,6 +22,12 @@ Run 'cmds' to see a list of available commands. <span class="success-text">Made 
                     <input type="text" id="cmd-input" autofocus spellcheck="false" autocomplete="off">
                 </div>
             </div>
+        </div>
+        <div id="fvim">
+            <div class="fvim-title">
+                <b><span class="info-text">Fvim - 1.0.0</span> // <span class="success-text">Ctrl+S = Save . . . Ctrl+Q = quit</span></b>
+            </div>
+            <textarea id="fvim-textarea" placeholder=". . ."></textarea>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="script.js"></script>
