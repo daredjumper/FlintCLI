@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Flint CLI</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+            :root{
+                --default-text: #eeeeee;
+                --info-text: #6ea3c7;
+                --error-text: #c76e6e;
+                --warn-text: #b4c76e;
+                --success-text: #75c76e;
+                --other-text: #6ec7c2;
+                --main-bg: #14141a;
+                --fvim-bg: #121218;
+            }
+
+            body, html{
+                background: #14141a;
+                margin: 0; padding: 0;
+                color: var(--default-text);
+                font-family: 'JetBrains Mono', monospace;
+                font-variant-ligatures: normal; /* Enables the cool coding ligatures */
+                font-optical-sizing: auto;
+                font-size: 16px;
+                height: 100%;
+            }
+
+            .default-font{
+                font-family: 'Consolas', monospace;
+            }
+
+            #terminal{
+                padding: 15px;
+            }
+
+            #logs {
+                font-family: 'JetBrains Mono', monospace;
+                font-variant-ligatures: normal; /* Enables the cool coding ligatures */
+                font-optical-sizing: auto;
+                font-size: 16px;
+                margin: 0;
+            }
+
+            .input-line{
+                display: flex;
+                align-items: center;
+            }
+
+            .input-container{
+                position: relative;
+                flex-grow: 1;
+            }
+
+            #cmd-input {
+                background: transparent;
+                border: none;
+                color: inherit;
+                font-family: inherit;
+                font-size: inherit;
+                width: 100%;
+                outline: none;
+                margin-left: 9.6px;
+            }
+
+            .default-text{
+                color: var(--default-text)
+            }
+            .info-text{
+                color: var(--info-text)
+            }
+            .error-text{
+                color: var(--error-text)
+            }
+            .warn-text{
+                color: var(--warn-text)
+            }
+            .success-text{
+                color: var(--success-text)
+            }
+            .other-text{
+                color: var(--other-text)
+            }
+
+            /* Fvim Styling */
+            #fvim{
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                top: 0; left: 0;
+                display: none;
+                background: var(--main-bg);
+                z-index: 99999;
+                flex-direction: column;
+            }
+
+            #fvim .fvim-title {
+                flex-shrink: 0;
+                padding: 6px 12px;
+                /* style as needed */
+            }
+
+            #fvim-textarea{
+                color: var(--default-text);
+                font-family: 'JetBrains Mono', monospace;
+                font-variant-ligatures: normal; /* Enables the cool coding ligatures */
+                font-optical-sizing: auto;
+                background: var(--main-bg);
+                border: 0;
+                outline: 0;
+                flex: 1;
+                resize: none;
+                width: 100%;
+                font-size: 16px;
+                box-sizing: border-box;
+                cursor: none;
+                padding: 0 11px 11px 11px;
+            }
+            #fvim-textarea::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            #fvim-textarea::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            #fvim-textarea::-webkit-scrollbar-thumb {
+                background: #2a2a38;
+                border-radius: 4px;
+            }
+
+            #fvim-textarea::-webkit-scrollbar-thumb:hover {
+                background: var(--info-text);
+            }
+        </style>
+    </head>
+    <body onclick="focusTerminal();">
+        <!-- Main Terminal -->
+        <div id="terminal">
+            <pre id="logs"><b><span class="default-font info-text">██████ ██      ██ ███    ██ ████████      ██████ ██      ██ 
+██     ██      ██ ████   ██    ██        ██      ██      ██ 
+█████  ██      ██ ██ ██  ██    ██        ██      ██      ██ 
+██     ██      ██ ██  ██ ██    ██        ██      ██      ██ 
+██     ███████ ██ ██   ████    ██         ██████ ███████ ██ [1.0.0]</span>
+
+Run 'cmds' to see a list of available commands. <span class="success-text">Made by flint.dev</span></b>
+
+</pre>
+            <div class="input-line">
+                <span class="prompt">C:\Flint\admin></span>
+                <div class="input-container">
+                    <input type="text" id="cmd-input" autofocus spellcheck="false" autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <!-- FVim -->
+
+        <div id="fvim">
+            <div class="fvim-title">
+                <b><span class="info-text">Fvim - 1.0.0</span> // <span class="success-text">Ctrl+S = Save . . . Ctrl+Q = quit</span></b>
+            </div>
+            <textarea id="fvim-textarea" placeholder=". . ."></textarea>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            const input = $("#cmd-input");
+            const history = $("#logs");
+            const fvim = $("#fvim");
+
+            var focusToggle = true;
+
+            // Command Management
+            const commands = {
+                cmds: {
+                    desc: "Show available commands",
+                    usage: "cmds [command]",
+                    run(args) {
+                        if (args[0]) {
+                            const cmd = commands[args[0]];
+                            if (!cmd) return error(`Unknown command: ${args[0]}`);
+                            return `${args[0]} - ${cmd.desc}\nUsage: ${cmd.usage}`;
+                        }
+                        return Object.entries(commands)
+                            .map(([name, cmd]) => `  ${name.padEnd(12)} ${cmd.desc}`)
+                            .join("\n");
+                    }
+                },
+                echo: {
+                    desc: "Print text to the terminal",
+                    usage: "echo <text>",
+                    run(args) {
+                        if (!args.length) return error("Usage: echo <text>");
+                        return args.join(" ");
+                    }
+                },
+                clear: {
+                    desc: "Clear the terminal",
+                    usage: "clear",
+                    run() {
+                        history.text("");
+                        return null; // null = no output
+                    }
+                },
+                open: {
+                    desc: "Opens a URL.",
+                    usage: "open <url> <flag?>",
+                    run(args) {
+                        if (!args.length) return error(`Usage: open <url> <flag?>\n\n`) + info("Optional Flags:\n --incog - open link via about:blank");
+                        if (args[1]) {
+                            const flag = args[1];
+                            if(flag == "--incog"){
+                                let incogWin = window.open("about:blank", "_blank");
+                                const incognitoSites = [
+                                    { name: "Home | Schoology", icon: "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://schoology.com&size=64" },
+                                    { name: "Google", icon: "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=64" },
+                                    { name: "Gmail", icon: "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://gmail.com&size=64" },
+                                    { name: "YouTube", icon: "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://youtube.com&size=64" },
+                                    { name: "Canvas", icon: "https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://instructure.com&size=64" },
+                                ];
+
+                                const disguise = incognitoSites[Math.floor(Math.random() * incognitoSites.length)];
+                                if(incogWin){
+                                    incogWin.document.open();
+                                    incogWin.document.write(`<!DOCTYPE html><html><head><title>${disguise.name}</title></head><body><iframe src="${args[0]}" style="top:0;left:0;width:100%;height:100%;position:absolute;border:0;outline:0;"></iframe></body></html>`);
+                                    incogWin.document.close();
+
+                                    const link = incogWin.document.createElement('link');
+                                    link.rel = 'icon';
+                                    link.type = 'image/png';
+                                    link.href = disguise.icon;
+                                    incogWin.document.head.appendChild(link);
+                                }
+                                return warn("NOTE: using --incog requires the specified website to accept itself to be embedded.");
+                            }
+                        }
+                        window.open(args[0]);
+                        return null; // null = no output
+                    }
+                },
+                fvim: {
+                    desc: "Opens the Flint CLI Text Editor.",
+                    usage: "fivm",
+                    run() {
+                        openfvim();
+                        return null; // null = no output
+                    }
+                }
+            };
+
+            function error(msg) {
+                return `<span class="error-text">${msg}</span>`;
+            }
+
+            function warn(msg) {
+                return `<span class="warn-text">${msg}</span>`;
+            }
+
+            function info(msg) {
+                return `<span class="info-text">${msg}</span>`;
+            }
+
+            function success(msg) {
+                return `<span class="success-text">${msg}</span>`;
+            }
+
+            function other(msg) {
+                return `<span class="other-text">${msg}</span>`;
+            }
+
+            input.on('keydown', function(e) {
+                if (e.key === "Enter") {
+                    const fullCommand = input.val().trim();
+                    if (!fullCommand) return;
+
+                    const parts = fullCommand.split(/\s+/);
+                    const cmdName = parts[0].toLowerCase();
+                    const args = parts.slice(1);
+                    const cmd = commands[cmdName];
+
+                    let block = `C:\\Flint\\admin> ${fullCommand}`;
+
+                    if (!cmd) {
+                        block += `\n${error(`'${cmdName}' is not a recognized command. Run 'cmds' for a list.`)}\n`;
+                    } else {
+                        const output = cmd.run(args);
+                        if (output !== null) block += `\n${output}\n`;
+                    }
+
+                    history.append(`${block}\n`);
+                    input.val("");
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
+            });
+
+            function focusTerminal(){
+                if (focusToggle) document.getElementById('cmd-input').focus();
+            }
+
+            /* Fvim Functionality */
+            function openfvim(){
+                fvim.css("display", "flex");
+                $('body').css('cursor', 'none');
+                focusToggle = false;
+                setTimeout(function(){
+                    document.getElementById('fvim-textarea').focus();
+                }, 100)
+            }
+
+            function closefvim(){
+                fvim.css('display', 'none');
+                $('body').css('cursor', 'default');
+                focusToggle = true;
+                setTimeout(function(){
+                    document.getElementById('cmd-input').focus();
+                }, 100)
+            }
+
+            // Allow tabbing in Fvim
+            $("#fvim-textarea").on('keydown', function(event){
+                if (event.keyCode === 9) {
+                    event.preventDefault(); // Prevent the default tab behavior
+                    const el = this;
+                    const start = el.selectionStart;
+                    const end = el.selectionEnd;
+                    const $this = $(el);
+                    const value = $this.val();
+
+                    // Set the new value: text before + tab + text after
+                    $this.val(value.substring(0, start) + "\t" + value.substring(end));
+
+                    // Put the cursor back in the right place
+                    el.selectionStart = el.selectionEnd = start + 1;
+                }
+            });
+
+            $("#fvim-textarea").on('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'q') {
+                    e.preventDefault();
+                    closefvim();
+                }
+            });
+        </script>
+    </body>
+</html>
