@@ -175,6 +175,7 @@ Run 'cmds' to see a list of available commands. <span class="success-text">Made 
 
             // Theme Managing
             var currentTheme = "default"
+            if (localStorage.getItem("fcli-theme") !== undefined){ currentTheme = localStorage.getItem("fcli-theme")} else {localStorage.setItem("fcli-theme", currentTheme)}
             const themes = {
                 "default": {
                     "--default-text": "#eeeeee",
@@ -237,6 +238,7 @@ Run 'cmds' to see a list of available commands. <span class="success-text">Made 
                 });
                 return true;
             }
+            applyTheme(currentTheme);
 
 
             // Command Management
@@ -338,6 +340,7 @@ Run 'cmds' to see a list of available commands. <span class="success-text">Made 
                                 if(match){
                                     applyTheme(match.toLowerCase());
                                     currentTheme = match;
+                                    localStorage.setItem("fcli-theme", match);
                                     return success(`Theme switched to '${match}'.`);
                                 } else {
                                     return error("Error: Theme '" + userInput + "' doesn't exist. Use --l to view a list of available themes.");
