@@ -74,10 +74,38 @@ const commands = {
     },
     fvim: {
         desc: "Opens the Flint CLI Text Editor.",
-        usage: "fivm",
+        usage: "fvim",
         run() {
             openfvim();
             return null; // null = no output
+        }
+    },
+    theme: {
+        desc: "Change the Flint CLI Terminal Theme",
+        usage: "theme <themeName / flag?>",
+        run(args){
+            if (!args.length) return error(`Usage: theme <themeName / flag?>\n\n`) + info("Optional Flags:\n --l - List out all available themes.");
+            if(args[0]){
+                const userInput = args[0];
+
+                const availableThemes = [
+                    "Default",
+                    "Nebula",
+                    "Sapphire",
+                    "Light",
+                    "Emerald"
+                ]
+
+                if(userInput == "--l"){
+                    return "List of themes:\nDefault\nNebula\nSapphire\nLight\nEmerald"
+                } else {
+                    if(availableThemes.includes(userInput)){
+                        return error("CLI Error: work in progress sorry");
+                    } else {
+                        return error("Error: Theme '" + userInput + "' doesn't exist. Use --l to view a list of available themes.");
+                    }
+                }
+            }
         }
     }
 };
