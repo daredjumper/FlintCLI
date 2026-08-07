@@ -6,6 +6,7 @@ var focusToggle = true;
 
 // Theme Managing
 var currentTheme = "default"
+if (localStorage.getItem("fcli-theme") !== undefined){ currentTheme = localStorage.getItem("fcli-theme")} else {localStorage.setItem("fcli-theme", currentTheme)}
 const themes = {
     "default": {
         "--default-text": "#eeeeee",
@@ -68,6 +69,7 @@ function applyTheme(key) {
     });
     return true;
 }
+applyTheme(currentTheme);
 
 
 // Command Management
@@ -169,6 +171,7 @@ const commands = {
                     if(match){
                         applyTheme(match.toLowerCase());
                         currentTheme = match;
+                        localStorage.setItem("fcli-theme", match);
                         return success(`Theme switched to '${match}'.`);
                     } else {
                         return error("Error: Theme '" + userInput + "' doesn't exist. Use --l to view a list of available themes.");
