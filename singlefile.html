@@ -173,6 +173,8 @@ Run 'cmds' to see a list of available commands. <span class="success-text">Made 
 
             var focusToggle = true;
 
+            var currentTheme = "Default"
+
             // Command Management
             const commands = {
                 cmds: {
@@ -266,7 +268,7 @@ Run 'cmds' to see a list of available commands. <span class="success-text">Made 
                             ]
 
                             if(userInput == "--l"){
-                                return "List of themes:\nDefault\nNebula\nSapphire\nLight\nEmerald"
+                                return info("List of themes:\n\n") + "Default\nNebula\nSapphire\nLight\nEmerald"
                             } else {
                                 if(availableThemes.includes(userInput)){
                                     return error("CLI Error: work in progress sorry");
