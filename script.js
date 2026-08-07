@@ -4,6 +4,72 @@ const fvim = $("#fvim");
 
 var focusToggle = true;
 
+// Theme Managing
+var currentTheme = "default"
+const themes = {
+    "default": {
+        "--default-text": "#eeeeee",
+        "--info-text": "#6ea3c7",
+        "--error-text": "#c76e6e",
+        "--warn-text": "#b4c76e",
+        "--success-text": "#75c76e",
+        "--other-text": "#6ec7c2",
+        "--main-bg": "#14141a",
+        "--fvim-bg": "#14141a"
+    },
+    "nebula": { // deep-space violet with a magenta/aurora glow
+        "--default-text": "#ede6f7",
+        "--info-text": "#9d7bd8",
+        "--error-text": "#e35a8f",
+        "--warn-text": "#d8a34d",
+        "--success-text": "#7bd8c0",
+        "--other-text": "#c77bd8",
+        "--main-bg": "#120a1f",
+        "--fvim-bg": "#120a1f"
+    },
+    "sapphire": { // crisp, cool jewel-tone blue
+        "--default-text": "#e4edf7",
+        "--info-text": "#4d9fe8",
+        "--error-text": "#e86464",
+        "--warn-text": "#e8b64d",
+        "--success-text": "#4de8b0",
+        "--other-text": "#7ab8f0",
+        "--main-bg": "#081428",
+        "--fvim-bg": "#081428"
+    },
+    "light": { // paper-white terminal, dark ink text
+        "--default-text": "#1c1f26",
+        "--info-text": "#1d5f8a",
+        "--error-text": "#a3312f",
+        "--warn-text": "#8a6a1d",
+        "--success-text": "#1f7a4d",
+        "--other-text": "#1d7a7a",
+        "--main-bg": "#eef0f4",
+        "--fvim-bg": "#eef0f4"
+    },
+    "emerald": { // dark forest bg, emerald/jade signature green
+        "--default-text": "#e3f2e9",
+        "--info-text": "#4d9ebd",
+        "--error-text": "#d8615a",
+        "--warn-text": "#d8b04d",
+        "--success-text": "#4dd88a",
+        "--other-text": "#7bd8b0",
+        "--main-bg": "#08150f",
+        "--fvim-bg": "#08150f"
+    }
+};
+
+function applyTheme(key) {
+    const theme = themes[key];
+    if (!theme) return false;
+    const root = document.documentElement;
+    Object.entries(theme).forEach(([prop, value]) => {
+        root.style.setProperty(prop, value);
+    });
+    return true;
+}
+
+
 // Command Management
 const commands = {
     cmds: {
@@ -89,18 +155,21 @@ const commands = {
                 const userInput = args[0];
 
                 const availableThemes = [
-                    "Default",
-                    "Nebula",
-                    "Sapphire",
-                    "Light",
-                    "Emerald"
+                    "default",
+                    "nebula",
+                    "sapphire",
+                    "light",
+                    "emerald"
                 ]
 
                 if(userInput == "--l"){
-                    return "List of themes:\nDefault\nNebula\nSapphire\nLight\nEmerald"
+                    return info("List of themes:\n\n") + "default\nnebula\nsapphire\nlight\nemerald"
                 } else {
-                    if(availableThemes.includes(userInput)){
-                        return error("CLI Error: work in progress sorry");
+                    const match = availableThemes.find(t => t.toLowerCase() === userInput.toLowerCase());
+                    if(match){
+                        applyTheme(match.toLowerCase());
+                        currentTheme = match;
+                        return success(`Theme switched to '${match}'.`);
                     } else {
                         return error("Error: Theme '" + userInput + "' doesn't exist. Use --l to view a list of available themes.");
                     }

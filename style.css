@@ -8,11 +8,11 @@
     --success-text: #75c76e;
     --other-text: #6ec7c2;
     --main-bg: #14141a;
-    --fvim-bg: #121218;
+    --fvim-bg: #14141a;
 }
 
 body, html{
-    background: #14141a;
+    background: var(--main-bg);
     margin: 0; padding: 0;
     color: var(--default-text);
     font-family: 'JetBrains Mono', monospace;
