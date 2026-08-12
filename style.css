@@ -7,6 +7,9 @@
     --warn-text: #b4c76e;
     --success-text: #75c76e;
     --other-text: #6ec7c2;
+    --muted-text: #6e6e78;
+    --accent-text: #c76eb4;
+    --debug-text: #9a9aa8;
     --main-bg: #14141a;
     --fvim-bg: #14141a;
 }
@@ -76,6 +79,15 @@ body, html{
 }
 .other-text{
     color: var(--other-text)
+}
+.muted-text{
+    color: var(--muted-text)
+}
+.accent-text{
+    color: var(--accent-text)
+}
+.debug-text{
+    color: var(--debug-text)
 }
 
 /* Fvim Styling */
